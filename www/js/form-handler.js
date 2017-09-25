@@ -1,5 +1,4 @@
 (function () {
-
   function init(){
     $('#submitButton').click(submitButtonHandler);
   }
@@ -18,9 +17,10 @@
       //make the AJAX call
       $.ajax({
         url: '/codey',
-        type: 'POST',
+        type: 'GET',
         data: {
-          code: testForm.apiName.value
+          q: testForm.apiName.value
+
         },
         success: postSuccessHandler
       });
@@ -29,15 +29,15 @@
   function postSuccessHandler (jsonData) {
     var $data = $('#post-results-container .data');
 
+
     //reset the UI
     $data.html('');
     $('.ajaxLoader').hide();
 
     //update the UI with the data returned from the AJAX call 
     $.each(jsonData.items, function (key, val) {
-        
-      $data.append('<li><b>  '+  val["tags"] + ' '  + '</li><br>');
-
+       var code = val["codeblocks"];
+      $data.append('<li><b> <code> '+ code + ' '  + '</code> </li><br> <hr>');
 //       $data.append('<li><b>' +  key + '</b>'   + val + '</li>');
     });
 

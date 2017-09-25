@@ -5,12 +5,12 @@ body {
 
 .home article{
 	position: relative;
-	width: 60%;
+	width: 90%;
 	margin: 20px auto;
 	padding: 20px;
 	background-color: #ededed;
 	border-radius: 5px;
-	text-align: center;
+	text-align: left;
 	-webkit-box-shadow: 10px 10px 43px -4px rgba(133,126,133,1);
 	-moz-box-shadow: 10px 10px 43px -4px rgba(133,126,133,1);
 	box-shadow: 10px 10px 43px -4px rgba(133,126,133,1);
@@ -45,7 +45,7 @@ body {
 }
 
 .home p, .home li {
-	font-size: 22px;
+	font-size: 18px;
 }
 
 .textLeft{

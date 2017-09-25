@@ -5,6 +5,8 @@
         <title>Extracting code Examples API</title>
         <link rel="stylesheet" type="text/css" href="css/style.css">
         <link rel="stylesheet" type="text/css" href="css/reset.css">
+	<link href="themes/prism.css" rel="stylesheet" />
+
     </head>
     <body class="home"> 
         <article class="textLeft" id="main">
@@ -13,18 +15,20 @@
             <p>Enter an API name and then click "Submit"</p>
             <div>
                 <form method="POST" id="testForm">
-                  <label>API name:</label>
+                  <label>Search query :</label>
                   <input type="text" name="apiName"><br>
                   <button type="submit" id="submitButton">Submit</button><img class="ajaxLoader" src="images/ajax-loader.gif">
                 </form>
             </div>
             <section id="post-results-container">
-              <h2>POST DATA</h2>
-              <p>Here is the data you posted:</p>
-              <ul class="data"></ul>
+              <h2>Extracted DATA (Code blocks) </h2>
+              <p>Here are the code blocks:</p>
+               <ul class="data"></ul>
             </section>
         </article>
       <script type="text/javascript" src="js/jquery-2.2.4.min.js"></script>
       <script type="text/javascript" src="js/form-handler.js"></script>
+      <script src="prism.js"></script>
+
     </body> 
 </html>
