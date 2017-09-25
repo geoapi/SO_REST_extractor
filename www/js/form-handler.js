@@ -17,7 +17,7 @@
       //make the AJAX call
       $.ajax({
         url: '/codey',
-        type: 'POST',
+        type: 'GET',
         data: {
           q: testForm.apiName.value
 
@@ -45,5 +45,5 @@
   };
 
 //init on document ready
-i$(document).ready(init);
+$(document).ready(init);
 })();

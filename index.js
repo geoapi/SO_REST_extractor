@@ -44,7 +44,7 @@ app.get('/', function (req, res) {
 });
 
 // the form
-app.post('/codey',function(req, res){
+app.get('/codey',function(req, res){
 //	res.setHeader('Content-Type', 'application/json');
 //res.send(JSON.stringify({
 //			code: req.body.code || null,

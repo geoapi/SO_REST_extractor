@@ -5,6 +5,7 @@
     "connect": "^3.6.5",
     "express": "^3.21.2",
     "lang-detector": "^1.0.6",
+    "language-detector": "^1.0.1",
     "nedb": "*",
     "prismjs": "^1.8.1",
     "request": "*",
