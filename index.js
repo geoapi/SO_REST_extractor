@@ -27,11 +27,11 @@ db.codeEg.ensureIndex({ fieldName: 'title', unique: true });
 
 // Necessary for accessing POST data via req.body object
 //app.use(express.bodyParser()); //deprecated no longer possible and generates two warrnings
-
 //app.use(connect.json());
 //app.use(connect.urlencoded());
 //app.use(connect.multipart());
 // Catch-all route to set global values
+
 app.use(function (req, res, next) {
     res.type('application/json');
     res.locals.wrap = wrapper.create({ start: new Date() });
@@ -49,9 +49,19 @@ app.post('/codey',function(req, res){
 //res.send(JSON.stringify({
 //			code: req.body.code || null,
 //			}));
-getqs.getQuestions(req.body.code, function (err, body){
+var getqs = require('./lib/getquestion.js');
+
+getqs.getQuestions(req.body.q, function (err, body){
+
+//var filterQs = require('./lib/filterQs.js');
+//var qids = filterQs.filterQuestions(body);
+//console.log(qids);
+var fc = require('./lib/filterbodyforcode.js');
+var fdc = fc.filterResult(body);
+//console.log(fdc); 
 res.type('application/json');
-res.send(body);
+
+res.send(fdc);
 
 res.end();
 });

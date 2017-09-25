@@ -1,5 +1,4 @@
 (function () {
-
   function init(){
     $('#submitButton').click(submitButtonHandler);
   }
@@ -20,7 +19,8 @@
         url: '/codey',
         type: 'POST',
         data: {
-          code: testForm.apiName.value
+          q: testForm.apiName.value
+
         },
         success: postSuccessHandler
       });
@@ -29,15 +29,15 @@
   function postSuccessHandler (jsonData) {
     var $data = $('#post-results-container .data');
 
+
     //reset the UI
     $data.html('');
     $('.ajaxLoader').hide();
 
     //update the UI with the data returned from the AJAX call 
     $.each(jsonData.items, function (key, val) {
-        
-      $data.append('<li><b>  '+  val["tags"] + ' '  + '</li><br>');
-
+       var code = val["codeblocks"];
+      $data.append('<li><b> <code> '+ code + ' '  + '</code> </li><br> <hr>');
 //       $data.append('<li><b>' +  key + '</b>'   + val + '</li>');
     });
 
@@ -45,5 +45,5 @@
   };
 
 //init on document ready
-$(document).ready(init);
+i$(document).ready(init);
 })();
