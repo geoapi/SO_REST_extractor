@@ -4,6 +4,7 @@
     "connect": "^3.6.5",
     "express": "^3.21.2",
     "nedb": "*",
-    "underscore": "*"
+    "underscore": "*",
+    "request": "*"
   }
 }

@@ -2,12 +2,22 @@ var connect = require('connect');
 
 var express = require('express');
 var app = express();
+var path = require("path");
+
 var Datastore = require('nedb');
 var db = {};
 var wrapper = require('./lib/wrapper.js');
-
+var getqs = require('./lib/getquestion.js');
 var port = process.argv[2] || 3050;
 var root = "http://localhost:" + port;
+var bodyParser = require('body-parser');
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+// the public directory
+
+app.use(express.static(path.join(__dirname, 'www')));
 
 // Connect to an NeDB database
 db.codeEg = new Datastore({ filename: 'db/codeDB', autoload: true });
@@ -30,8 +40,28 @@ app.use(function (req, res, next) {
 
 // Routes
 app.get('/', function (req, res) {
-    res.send('The API is working.');
+//    res.send('The API is working.');
 });
+
+// the form
+app.post('/codey',function(req, res){
+//	res.setHeader('Content-Type', 'application/json');
+//res.send(JSON.stringify({
+//			code: req.body.code || null,
+//			}));
+getqs.getQuestions(req.body.code, function (err, body){
+res.type('application/json');
+res.send(body);
+
+res.end();
+});
+
+     
+})
+
+	//console.log('you posted: API Name: ' + req.body.code + search_so);
+
+
 
 app.get('/code', function (req, res) {
     db.codeEg.find({}, function (err, results) {
@@ -79,6 +109,7 @@ app.get('/code/:id', function (req, res) {
         res.json(200, res.locals.wrap(result, { self: root + '/code/' + req.params.id }));
     });
 });
+
 
 app.put('/code/:id', function (req, res) {
     db.codeEg.update({ _id: req.params.id }, req.body, { upsert: false }, function (err, num, upsert) {
