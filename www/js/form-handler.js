@@ -19,8 +19,8 @@
         url: '/codey',
         type: 'GET',
         data: {
-          q: testForm.apiName.value
-
+          queryval: testForm.apiName.value,
+          tagval: testForm.tag.value  
         },
         success: postSuccessHandler
       });
@@ -28,7 +28,6 @@
 
   function postSuccessHandler (jsonData) {
     var $data = $('#post-results-container .data');
-
 
     //reset the UI
     $data.html('');
