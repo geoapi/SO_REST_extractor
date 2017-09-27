@@ -1,11 +1,14 @@
 {
   "dependencies": {
     "body-parser": "^1.18.2",
+    "buffer": "^5.0.7",
     "cheerio": "^1.0.0-rc.2",
     "connect": "^3.6.5",
     "express": "^3.21.2",
     "lang-detector": "^1.0.6",
     "language-detector": "^1.0.1",
+    "mongodb": "^2.2.31",
+    "mongoose": "^4.11.13",
     "nedb": "*",
     "prismjs": "^1.8.1",
     "request": "*",

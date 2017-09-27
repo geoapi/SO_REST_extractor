@@ -5,30 +5,28 @@
         <title>Extracting code Examples API</title>
         <link rel="stylesheet" type="text/css" href="css/style.css">
         <link rel="stylesheet" type="text/css" href="css/reset.css">
-	<link href="themes/prism.css" rel="stylesheet" />
-
     </head>
     <body class="home"> 
         <article class="textLeft" id="main">
-            <img class="logo" src="images/nodejs-logo.png">
             <h1>Query Form</h1>
             <p>Enter an API name and then click "Submit"</p>
             <div>
-                <form method="POST" id="testForm">
+                <form action="/" method="POST" id="testForm">
                   <label>Search query :</label>
                   <input type="text" name="apiName"><br>
-                  <button type="submit" id="submitButton">Submit</button><img class="ajaxLoader" src="images/ajax-loader.gif">
-                </form>
+		  <label> Insert the Tag : </label><br>
+		  <input type="text" name="tag"><br>
+
+                  <button type="submit" id="submitButton">Submit</button>
+              </form>
             </div>
             <section id="post-results-container">
               <h2>Extracted DATA (Code blocks) </h2>
-              <p>Here are the code blocks:</p>
+              <p>Here are the code blocks extracted from StackOverflow:</p>
                <ul class="data"></ul>
             </section>
         </article>
       <script type="text/javascript" src="js/jquery-2.2.4.min.js"></script>
-      <script type="text/javascript" src="js/form-handler.js"></script>
-      <script src="prism.js"></script>
 
     </body> 
 </html>
