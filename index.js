@@ -35,7 +35,7 @@ app.post('/',function(req, res){
 var getqs = require('./lib/getquestion.js');
 
 for (i= 1; i < 3; i++){
-   getqs.getQuestions(req.body.apiName,req.body.tag,i, function (err, body){
+   getqs.getQuestions(req.body.apiName,req.body.tag,i, function(body){
      var fc = require('./lib/filterbodyforcode.js');
      var fdc = fc.filterResult(body);
      var fqids = require('./lib/filterQIds.js');
