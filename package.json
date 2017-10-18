@@ -7,7 +7,7 @@
     "express": "^3.21.2",
     "lang-detector": "^1.0.6",
     "language-detector": "^1.0.1",
-    "mongodb": "^2.2.31",
+    "mongodb": "^2.2.33",
     "mongoose": "^4.11.13",
     "nedb": "*",
     "prismjs": "^1.8.1",
