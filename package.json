@@ -1,17 +1,35 @@
 {
   "dependencies": {
+    "ast-query": "^2.0.0",
+    "ast-traverse": "^0.1.1",
+    "babel-traverse": "^6.26.0",
+    "babylon": "^6.18.0",
     "body-parser": "^1.18.2",
     "buffer": "^5.0.7",
     "cheerio": "^1.0.0-rc.2",
     "connect": "^3.6.5",
+    "esprima": "^4.0.0",
+    "estraverse": "^4.2.0",
     "express": "^3.21.2",
+    "is-base-url": "^1.3.0",
+    "java-parser": "0.0.2",
+    "javaparser": "^2.0.2",
     "lang-detector": "^1.0.6",
     "language-detector": "^1.0.1",
-    "mongodb": "^2.2.31",
+    "mongodb": "^2.2.33",
     "mongoose": "^4.11.13",
     "nedb": "*",
     "prismjs": "^1.8.1",
+    "recast": "^0.12.7",
     "request": "*",
-    "underscore": "*"
+    "require-load": "^2.2.0",
+    "sloc": "^0.2.0",
+    "underscore": "^1.8.3"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-react-native": "^4.0.0"
   }
 }
