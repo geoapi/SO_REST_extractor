@@ -5,7 +5,7 @@ var express = require('express');
 var app = express();
 var path = require("path");
 var async = require('async');
-
+var jp = require('jsonpath');
 var wrapper = require('./lib/wrapper.js');
 var port = process.argv[2] || 3000;
 var root = "http://localhost:" + port;
@@ -20,6 +20,58 @@ app.get('/', function (req, res) {
   res.sendfile('./www/index.html');
 });
 
+//Get code examples based on a given API method
+app.get('/code/methods/:method_name', function(req,res){
+// Look at answers
+
+var results_file = require('./resultfile.json');
+var code = results_file.items[0]['body'];
+var regexp = require('./lib/detectURL.js');
+var r = regexp.detectRegExp(code);
+res.send(r);
+});
+
+
+
+// Get all code detected from answers into file1.json
+app.get('/questions/code',function(req,res){
+var results_file = require('./alltagged.json');
+var fc = require('./lib/filterbodyforcode.js');
+var fdc = fc.filterResult(JSON.stringify(results_file));
+res.send(JSON.parse(fdc));
+
+fs.writeFile("questionscode.json", fdc, 'utf8', function(err){
+             if (err) throw err
+             console.log('complete..')}
+);
+});
+
+
+
+// Get all code detected from answers into file1.json
+app.get('/answers/code',function(req,res){
+var results_file = require('./resultfile.json');
+var fc = require('./lib/filterbodyforcode.js');
+var fdc = fc.filterResult(JSON.stringify(results_file));
+res.send(JSON.parse(fdc));
+
+fs.writeFile("answerscode.json", fdc, 'utf8', function(err){
+             if (err) throw err
+             console.log('complete..')}
+);
+});
+
+
+// Get questions titles of specific tags
+app.get('/questions/:tag/:param', function(req,res){
+var a = require('./alltagged.json');
+if (req.params.param === 'title' || req.params.param==='question_id'){
+var txt = "$.."+ req.params.param;
+var que = jp.query(a,txt);
+res.send(que);
+}});
+
+
 // Get answers related to 100 of Qs
 //===================================================
 app.get('/answers/:tag',function(req,res){
@@ -32,17 +84,17 @@ var ga = require('./lib/getanswers');
 ga.getAnswers(get100, function(err, result)
       {
       if (err) reject(err);
-      console.log(result);
+      //console.log(typeof(result)); //string
 
-      fs.writeFile("resultfile.json", jsonresult2, 'utf8', function(err){
+      fs.writeFile("resultfile.json", result, 'utf8', function(err){
              if (err) throw err
              console.log('complete.. for code in answers')}
 
      // var fa = require('./lib/filteransbodyforcode.js');
      // var fr = fa.filterAnswersResult(result);
      // var jsonresult2 = JSON.stringify(fr);
-        });
-)
+        );
+})
 
 
 
@@ -62,8 +114,7 @@ return qids;
 
 //
 res.send('done');
-}
-);
+});
 
 
 //Get all Qids from a given file
@@ -76,10 +127,7 @@ fs.readFile("alltagged.json", 'utf8', function(err, data)
 		    res.send(getQids(data));                  
                   });
 
-
 function getQids(data){
-
-
 qids = [];
 jsonobj = JSON.parse(data);
 for ( var i in jsonobj.items){
@@ -87,10 +135,8 @@ for ( var i in jsonobj.items){
         qids[i] =jsonobj.items[i].question_id;
               }
 console.log(qids.length);
-
 return qids;
 }
-
 });
 
 
@@ -197,6 +243,9 @@ res.send('done');
 
 
 
+// 
+
+
 
 
 // TODO change the root html form and change the logic within here
@@ -255,10 +304,8 @@ res.end();
 
 
 app.get('/codes', function(req, res){
-fs.readFile('./file1.json', function (err, content){
- if (err) throw err;
- res.send(JSON.stringify(content));
-});
+var content =require('./file1.json');
+res.send(JSON.parse(content));
 });
 
 app.get('/codes/:id',function(req,res){
