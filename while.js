@@ -20,11 +20,56 @@ app.get('/', function (req, res) {
   res.sendfile('./www/index.html');
 });
 
+// Get answers related to 100 of Qs
+//===================================================
+app.get('/answers/:tag',function(req,res){
+//var tag = req.params.tag;
+data = fs.readFileSync("alltagged.json", 'utf8');
+var qids = getQids(data);
+get100 = qids.slice(0,100);
+
+var ga = require('./lib/getanswers');
+ga.getAnswers(get100, function(err, result)
+      {
+      if (err) reject(err);
+      console.log(result);
+
+      fs.writeFile("resultfile.json", jsonresult2, 'utf8', function(err){
+             if (err) throw err
+             console.log('complete.. for code in answers')}
+
+     // var fa = require('./lib/filteransbodyforcode.js');
+     // var fr = fa.filterAnswersResult(result);
+     // var jsonresult2 = JSON.stringify(fr);
+        });
+)
+
+
+
+ //call readFile function to get the Qids
+
+function getQids(data){
+qids = [];
+jsonobj = JSON.parse(data);
+for ( var i in jsonobj.items){
+//        console.log(jsonobj.items[i].question_id);
+        qids[i] =jsonobj.items[i].question_id;
+              }
+//console.log(qids.length);
+return qids;
+}
+
+
+//
+res.send('done');
+}
+);
+
+
 //Get all Qids from a given file
 //==================================================
 
 app.get('/questions/qids/',function(req,res){
-
 fs.readFile("alltagged.json", 'utf8', function(err, data)
                   {
                     if (err) throw err;
@@ -154,7 +199,7 @@ res.send('done');
 
 
 
-
+// TODO change the root html form and change the logic within here
 app.post('/',function(req, res){
 //go fetch questions from SO API based on the query and tag provided by user
 var getqs = require('./lib/getqspromised.js');
