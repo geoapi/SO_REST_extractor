@@ -46,7 +46,7 @@ var r = regexp.detectRegExp(code1); //returns a JSON obj with uri and any method
 //console.log(JSON.stringify(r));
 //JSONPATH will filter all results that uses an api identified by it's uri
 var f = jp.query(r,'$.terms[?(@.uri)]');
-console.log(JSON.stringify(jp.query(r,'$.terms')));
+//console.log(JSON.stringify(jp.query(r,'$.terms')));
 //
 console.log(f);
 // f[0].uri returns the uri and position
@@ -57,9 +57,12 @@ console.log(f);
 // console.log(f[0].methods_terms[item]);
   if (look_for === f[0].methods_terms[item]){
    console.log('found ',f[0].methods_terms[item]);
-  list_results.answers.push(
+//  fstr = JSON.stringify(f[0].methods_terms[item]);
+   list_results.answers.push(
       {
-        "found":true
+        "found":true,
+        "content":results_file.items[0]['body']
+        
       }
      )
    }
