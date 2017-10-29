@@ -29,9 +29,8 @@ var look_for = req.params.method_name; //the method that we are looking for
 
 
 //for loop
-// for (var i in results_file.items){
-//change 0 to i when TODO
-var code = results_file.items[0]['body'];
+for (var i in results_file.items){
+var code = results_file.items[i]['body'];
 
 var d = require('./lib/detectcode.js');
 //find any code snippets within the text
@@ -61,7 +60,10 @@ console.log(f);
    list_results.answers.push(
       {
         "found":true,
-        "content":results_file.items[0]['body']
+        "question_id":results_file.items[i]['question_id'],
+	"answer_id":results_file.items[i]['answer_id'],
+        "code":code1,
+        "content":results_file.items[i]['body']
         
       }
      )
@@ -72,7 +74,7 @@ console.log(f);
 
 
 }
-
+}
 
 
 
