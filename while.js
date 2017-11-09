@@ -83,7 +83,9 @@ res.send(list_results);
 
 
 
-// Get all code detected from answers into quesionscode.json
+<<<<<<< HEAD
+// Get all code detected from answers into questionscode.json
+>>>>>>> 7b0d3cef5ebd9c338ffe0c222665e8209525b726
 app.get('/questions/code',function(req,res){
 var results_file = require('./alltagged.json');
 var fc = require('./lib/filterbodyforcode.js');
@@ -98,7 +100,7 @@ fs.writeFile("questionscode.json", fdc, 'utf8', function(err){
 
 
 
-// Get all code detected from answers into file1.json
+// Get all code detected from answers into answercode.json
 app.get('/answers/code',function(req,res){
 var results_file = require('./resultfile.json');
 var fc = require('./lib/filterbodyforcode.js');
