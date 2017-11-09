@@ -41,7 +41,7 @@ var regexp = require('./lib/detectURL.js');
 
 // now code 1 is an array we need to look at each code block
 for (var c in code1){
-var r = regexp.detectRegExp(code1); //returns a JSON obj with uri and any methods detected
+var r = regexp.detectRegExp(code1[c]); //returns a JSON obj with uri and any methods detected
 //console.log(JSON.stringify(r));
 //JSONPATH will filter all results that uses an api identified by it's uri
 var f = jp.query(r,'$.terms[?(@.uri)]');
@@ -83,7 +83,7 @@ res.send(list_results);
 
 
 
-// Get all code detected from answers into file1.json
+// Get all code detected from answers into quesionscode.json
 app.get('/questions/code',function(req,res){
 var results_file = require('./alltagged.json');
 var fc = require('./lib/filterbodyforcode.js');
@@ -128,6 +128,7 @@ app.get('/answers/:tag',function(req,res){
 //var tag = req.params.tag;
 data = fs.readFileSync("alltagged.json", 'utf8');
 var qids = getQids(data);
+//try to TODO measure the qids length , take every 100 for processing like below
 get100 = qids.slice(0,100);
 
 var ga = require('./lib/getanswers');
@@ -242,15 +243,19 @@ async function getAllQuestions(tag){
     var page = 1
     var res = await ta.getQuestions(tag,page);
 //    console.log(res);
+    var res_parsed = JSON.parse(res);
     var all = [res];
    //specific page numbers are needed based on an allocation for each request && page < 3
-    while(res.has_more && res.quota_remaining > 0){
+//console.log(res_parsed);
+    while(res_parsed.has_more && res_parsed.quota_remaining > 0){
  //       console.log('res has more',res.has_more ,'quota remaining',res.quota_remaining)
         page++
         res=await ta.getQuestions(tag,page);
+        var res_parsed = JSON.parse(res);
         all.push(res);
     }
-    return JSON.parse(all)
+    //return JSON.parse(all)
+     return all
 }
 
 
