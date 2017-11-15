@@ -260,7 +260,7 @@ async function getAllQuestions(tag){
     while(hm && qr > 0){
         page++
         res=await ta.getQuestions(tag,page);
-        var res = JSON.parse(res);
+       // var res = JSON.parse(res);
         var r1 = JSON.parse(res);
         var hm = r1.has_more;
         console.log(hm);
