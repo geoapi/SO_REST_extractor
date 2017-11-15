@@ -1,0 +1,479 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "This is an API documentation for CuCoAPI. An Extraction and Curation API for API documentation.  For this sample, you can use the api key `` to test the authorization filters.",
+        "version": "1.0.0",
+        "title": "CoCuAPI - API documentation Extraction API",
+        "termsOfService": "#/terms/",
+        "contact": {
+            "email": "g.ajam@student.unsw.edu.au"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        }
+    },
+    "host": "ec2-54-153-154-200.ap-southeast-2.compute.amazonaws.com:3000",
+    "basePath": "/",
+    "tags": [
+        {
+            "name": "Examples",
+            "description": "Everything about usage examples",
+            "externalDocs": {
+                "description": "Find out more",
+                "url": "https://geoapi.github.io"
+            }
+        },
+        {
+            "name": "Code",
+            "description": "Usage Examples using a specific method/call"
+        }
+    ],
+    "schemes": [
+        "http"
+    ],
+    "paths": {
+        "/tag/:id": {
+            "get": {
+                "tags": [
+                    "Questions"
+                ],
+                "summary": "Get all questions related to a specific tag",
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Items"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid status value"
+                    }
+                },
+                "security": [
+                    {
+                        "cucoapi_auth": [
+                            "write:explanations",
+                            "read:explanations"
+                        ]
+                    }
+                ]
+            }
+        },
+        "/questions/code": {
+            "get": {
+                "tags": [
+                    "Questions"
+                ],
+                "summary": "Get all Code out of questions",
+                "description": "Get all detected code from questions into the DB - This process is for initilization of the DB",
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Pet"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid status value"
+                    }
+                },
+                "security": [
+                    {
+                        "cucoapi_auth": [
+                            "write:explanations",
+                            "read:explanations"
+                        ]
+                    }
+                ]
+            }
+        },
+        "/questions/qids": {
+            "get": {
+                "tags": [
+                    "Questions"
+                ],
+                "summary": "Get all Qids (questions IDs) from a given set of questions, useful when you need to fetch answers",
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Pet"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid status value"
+                    }
+                },
+                "security": [
+                    {
+                        "cucoapi_auth": [
+                            "write:explanations",
+                            "read:explanations"
+                        ]
+                    }
+                ]
+            }
+        },
+        "/answers/code": {
+            "get": {
+                "tags": [
+                    "Answers"
+                ],
+                "summary": "Get all Code out of answers",
+                "description": "Get all detected code from answers into the DB - This process is for initilization of the DB",
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Pet"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid status value"
+                    }
+                },
+                "security": [
+                    {
+                        "cucoapi_auth": [
+                            "write:explanations",
+                            "read:explanations"
+                        ]
+                    }
+                ]
+            }
+        },
+        "/code/methods/:method_name": {
+            "get": {
+                "tags": [
+                    "Code"
+                ],
+                "summary": "Get code examples using a specific method(FQDN).",
+                "description": "You have to supply a method name",
+                "operationId": "method_name",
+                "consumes": [
+                    "application/json",
+                    "application/xml"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "method name that needs to be provided to retrive a code example",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Method"
+                        }
+                    }
+                ],
+                "responses": {
+                    "400": {
+                        "description": "Invalid entry, a method name is required"
+                    },
+                    "404": {
+                        "description": "usage code for this method is not found"
+                    },
+                    "405": {
+                        "description": "Validation exception"
+                    }
+                },
+                "security": [
+                    {
+                        "cucoapi_auth": [
+                            "write:explanations",
+                            "read:explanations"
+                        ]
+                    }
+                ]
+            }
+        },
+        "/questions/:tag/:param": {
+            "get": {
+                "tags": [
+                    "Questions"
+                ],
+                "summary": "Get questions titles of specific tags",
+                "description": "Get titles of questions related to the specific API initilized by /questions/code and /anwers/code",
+                "operationId": "findPetsByStatus",
+                "produces": [
+                    "application/xml",
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Status values that need to be considered for filter",
+                        "required": true,
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "available",
+                                "pending",
+                                "sold"
+                            ],
+                            "default": "available"
+                        },
+                        "collectionFormat": "multi"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Pet"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid status value"
+                    }
+                },
+                "security": [
+                    {
+                        "cucoapi_auth": [
+                            "write:explanations",
+                            "read:explanations"
+                        ]
+                    }
+                ]
+            }
+        },
+        "/answers/:tag": {
+            "get": {
+                "tags": [
+                    "Answers"
+                ],
+                "summary": "Get answers related to 100 of Qs",
+                "description": "Get answers ofspecific tag related to the specific API initilized by /questions/code and /anwers/code. This end point purpose is to get questions ids to use them for getting the answers. This method is ***limited to 100 of answers*** per the StackOverflow API **limit**, a workaround is to handle the rest of the Qids with new requests which are again limited to 100 and measured against the quota",
+                "produces": [
+                    "application/xml",
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Status values that need to be considered for filter",
+                        "required": true,
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "available",
+                                "pending",
+                                "sold"
+                            ],
+                            "default": "available"
+                        },
+                        "collectionFormat": "multi"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Pet"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid status value"
+                    }
+                },
+                "security": [
+                    {
+                        "cucoapi_auth": [
+                            "write:explanations",
+                            "read:explanations"
+                        ]
+                    }
+                ]
+            }
+        },
+        "/questions/:Qids": {
+            "get": {
+                "tags": [
+                    "Questions"
+                ],
+                "summary": "Get answers related to 100 of Qs",
+                "description": "Get answers ofspecific tag related to the specific API initilized by /questions/code and /anwers/code. This end point purpose is to get questions ids to use them for getting the answers. This method is ***limited to 100 of answers*** per the StackOverflow API **limit**, a workaround is to handle the rest of the Qids with new requests which are again limited to 100 and measured against the quota",
+                "produces": [
+                    "application/xml",
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Status values that need to be considered for filter",
+                        "required": true,
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "available",
+                                "pending",
+                                "sold"
+                            ],
+                            "default": "available"
+                        },
+                        "collectionFormat": "multi"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Pet"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid status value"
+                    }
+                },
+                "security": [
+                    {
+                        "cucoapi_auth": [
+                            "write:explanations",
+                            "read:explanations"
+                        ]
+                    }
+                ]
+            }
+        }
+    },
+    "securityDefinitions": {
+        "cucoapi_auth": {
+            "type": "oauth2",
+            "authorizationUrl": "http://ec2-54-153-154-200.ap-southeast-2.compute.amazonaws.com:3000/oauth/dialog",
+            "flow": "implicit",
+            "scopes": {
+                "write:explanations": "write explanations in your account",
+                "read:explanations": "read your explanations"
+            }
+        }
+    },
+    "definitions": {
+        "Method": {
+            "type": "object",
+            "properties": {
+                "method_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "Category": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "name": {
+                    "type": "string"
+                }
+            },
+            "xml": {
+                "name": "Category"
+            }
+        },
+        "Items": {
+            "type": "string"
+        },
+        "Tag": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "name": {
+                    "type": "string"
+                }
+            },
+            "xml": {
+                "name": "Tag"
+            }
+        },
+        "Pet": {
+            "type": "object",
+            "required": [
+                "name",
+                "photoUrls"
+            ],
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "category": {
+                    "$ref": "#/definitions/Category"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "doggie"
+                },
+                "photoUrls": {
+                    "type": "array",
+                    "xml": {
+                        "name": "photoUrl",
+                        "wrapped": true
+                    },
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "tags": {
+                    "type": "array",
+                    "xml": {
+                        "name": "tag",
+                        "wrapped": true
+                    },
+                    "items": {
+                        "$ref": "#/definitions/Tag"
+                    }
+                },
+                "status": {
+                    "type": "string",
+                    "description": "pet status in the store",
+                    "enum": [
+                        "available",
+                        "pending",
+                        "sold"
+                    ]
+                }
+            },
+            "xml": {
+                "name": "Pet"
+            }
+        }
+    },
+    "externalDocs": {
+        "description": "Find out more about Swagger",
+        "url": "http://swagger.io"
+    }
+}
