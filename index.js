@@ -255,7 +255,8 @@ async function getAllQuestions(tag){
  // var res = JSON.parse(res);
         //console.log('res has more',res.has_more);
 
-    var all = [res];
+    var all = [];
+    all.push(res);
    //specific page numbers are needed based on an allocation for each request && page < 3
     while(hm && qr > 0){
         page++
@@ -263,12 +264,15 @@ async function getAllQuestions(tag){
        // var res = JSON.parse(res);
         var r1 = JSON.parse(res);
         var hm = r1.has_more;
-        console.log(hm);
+      //  console.log(hm);
         var qr = r1.quota_remaining;
-
         all.push(res);
     }
-    return JSON.parse(all)
+    //if there are more pages store where you've ended up with
+  //  if (hm){
+  //  all.page = page;
+  //    }
+    return all;
 }
 
 
@@ -305,7 +309,7 @@ return a;
 
 }
 */
-res.sendfile('./alltagged.json');
+res.send('working..');
 });
 
 
