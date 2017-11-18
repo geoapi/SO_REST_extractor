@@ -6,7 +6,7 @@ var app = express();
 var path = require("path");
 var async = require('async');
 var jp = require('jsonpath');
-var wrapper = require('./lib/wrapper.js');
+//var wrapper = require('./lib/wrapper.js');
 var port = process.argv[2] || 3000;
 var root = "http://localhost:" + port;
 var mongoose = require('mongoose');
@@ -25,6 +25,27 @@ app.get('/dist/spec.json', function(req,res){
      res.sendfile(path.normalize(__dirname + '/dist/spec.json'))  
 
 })
+
+app.get('/code/methods/DB/:method',function(req,res){
+
+var MongoClient = require('mongodb').MongoClient;
+var url = "mongodb://localhost:27017/answers";
+MongoClient.connect(url, function(err, db) {
+  if (err) throw err;
+  var cursor = db.collection("items").find();
+   cursor.each(function(err, doc) {
+    if (err) throw err;
+    console.log("document: " + doc._id, doc);
+   //TODO make a function of of the next get request that takes a document element such as for e.g. _id , question_id, is_accepted etc.. and return 
+  
+  });
+
+})
+
+res.end();
+});
+
+
 
 //Get code examples based on a given API method
 app.get('/code/methods/:method_name', function(req,res){
@@ -69,6 +90,8 @@ console.log(f);
         "question_id":results_file.items[i]['question_id'],
 	"answer_id":results_file.items[i]['answer_id'],
         "code":code1,
+        //make sure tags works TODO recheck TODO
+        "tags":results_file.items[i]['tags'],
         "content":results_file.items[i]['body']
         
       }
@@ -82,29 +105,37 @@ console.log(f);
 }
 }
 
-
-
 res.send(list_results);
 });
 
 
 
-// Get all code detected from answers into file1.json
+// Get all code detected from Qs into questionscode.json
 app.get('/questions/code',function(req,res){
 var results_file = require('./alltagged.json');
-var fc = require('./lib/filterbodyforcode.js');
-var fdc = fc.filterResult(JSON.stringify(results_file));
-res.send(JSON.parse(fdc));
 
-fs.writeFile("questionscode.json", fdc, 'utf8', function(err){
+var fc = require('./lib/filterbodyforcode.js');
+var allContent = new Array();
+for (i = 0; i < results_file.length; i++) {
+var fdc = fc.filterResult(results_file[i]);
+var fdcParsed = JSON.parse(fdc);
+allContent.push(fdc);
+//res.send(fdcParsed);
+}
+
+res.send(allContent);
+fs.writeFile("questionscode.json",allContent , 'utf8', function(err){
              if (err) throw err
              console.log('complete..')}
 );
+res.end();
 });
 
 
 
-// Get all code detected from answers into file1.json
+
+
+// Get all code detected from answers into store
 app.get('/answers/code',function(req,res){
 var results_file = require('./resultfile.json');
 var fc = require('./lib/filterbodyforcode.js');
@@ -112,8 +143,8 @@ var fdc = fc.filterResult(JSON.stringify(results_file));
 res.send(JSON.parse(fdc));
 
 fs.writeFile("answerscode.json", fdc, 'utf8', function(err){
-             if (err) throw err
-             console.log('complete..')}
+          if (err) throw err
+          console.log('complete..')}
 );
 });
 
@@ -129,28 +160,56 @@ res.send(que);
 
 
 // Get answers related to 100 of Qs
+// TODO Remove tag, have a workflow to make sure the process starts with Qs first then with As
 //===================================================
 app.get('/answers/:tag',function(req,res){
-//var tag = req.params.tag;
-data = fs.readFileSync("alltagged.json", 'utf8');
-var qids = getQids(data);
-get100 = qids.slice(0,100);
+  var data = require("./alltagged.json");
+//DATA comes as an array each element may have 100s of qs TODO make sure you have a mechanisim to go through them all for processing
+  var allQids =[];
+  for (i =0; i < data.length; i++){
+    var qids = getQids(data[i]);
+      for (j in qids){
+	allQids.push(qids[j]);
+        }
+     }
 
-var ga = require('./lib/getanswers');
-ga.getAnswers(get100, function(err, result)
-      {
-      if (err) reject(err);
-      //console.log(typeof(result)); //string
+ // fs.writeFile('resultfile.json', '', function(){console.log('done emptying file content')});
+//var ga = require('./lib/getanswers');
+  var ga = require('./lib/getanswersPromise.js');
 
-      fs.writeFile("resultfile.json", result, 'utf8', function(err){
-             if (err) throw err
-             console.log('complete.. for code in answers')}
+  var index1 = 0;
+  while (index1 < allQids.length){
+      get100 = allQids.slice(index1,index1+100);
+// TODO make condition if the remaning length is greater than 100 then just add 100, if not then takes the actual remaining length
 
-     // var fa = require('./lib/filteransbodyforcode.js');
+      index1 = index1+100;
+    var testObj = [];
+     ga.getAnswers(get100).then(function(result){
+/*
+   TODO  you need to make sure storing the file is json compatible, read old data and append to the obj or store in a DB right away.
+ */
+var myObj = JSON.parse(result);
+   saveDB(myObj.items);
+   testObj.push(myObj.items);
+/*         
+      fs.appendFile('resultfile.json', result, function (err) {
+	  if (err) throw err;
+	  console.log('Saved!');
+          });
+*/
+
+      }).catch(function(error){
+        console.log('promise rejected for QIDS ! ', error);
+          });
+
+
+    // var fa = require('./lib/filteransbodyforcode.js');
      // var fr = fa.filterAnswersResult(result);
      // var jsonresult2 = JSON.stringify(fr);
-        );
-})
+}
+
+
+
 
 
 
@@ -176,31 +235,28 @@ res.send('done');
 //Get all Qids from a given file
 //==================================================
 
+
 app.get('/questions/qids/',function(req,res){
-fs.readFile("alltagged.json", 'utf8', function(err, data)
-                  {
-                    if (err) throw err;
-		    res.send(getQids(data));                  
-                  });
+var data = require('./alltagged.json');
+
+var allqids = [];
+for (i =0; i < data.length; i++){
+  var qid = getQids(data[i]);
+  allqids.push(qid); }
 
 function getQids(data){
 qids = [];
 jsonobj = JSON.parse(data);
 for ( var i in jsonobj.items){
-        console.log(jsonobj.items[i].question_id);  
-        qids[i] =jsonobj.items[i].question_id;
+        //console.log(jsonobj.items[i].question_id);  
+        qids[qids.length] =jsonobj.items[i].question_id;
               }
-console.log(qids.length);
+//console.log(qids.length);
 return qids;
 }
+res.send(allqids);
+res.end();
 });
-
-
-
-
-
-
-
 
 
 
@@ -214,6 +270,7 @@ var tag = req.params.id;
 //var qg = require('./lib/getquestionstagged.js');
 //console.log(tag);
 
+/*
 saveCodetoDB = function(data){
 var MongoClient = require('mongodb').MongoClient;
 MongoClient.connect("mongodb://localhost:27017/stackcodes", function (err, db) {
@@ -227,6 +284,7 @@ MongoClient.connect("mongodb://localhost:27017/stackcodes", function (err, db) {
 
 });
 }
+*/
 
 var ta = require('./lib/getquestionstagged.js');   // In production change URL to 100 pr req
 
@@ -375,7 +433,7 @@ res.end();
 })
 //res.send('Completed successfuly');
 
-
+//TODO del or change files used in the below ops
 app.get('/codes', function(req, res){
 var content =require('./file1.json');
 res.send(JSON.parse(content));
@@ -389,4 +447,37 @@ content = JSON.parse(content);
 res.send(content["items"][id]);
 
 });
+
+
+
+
+
+
+// SaveDD function takes an obj and save it into a nonsql db
+function saveDB(myobj){
+var MongoClient = require('mongodb').MongoClient;
+var url = "mongodb://localhost:27017/answers";
+
+MongoClient.connect(url, function(err, db) {
+  if (err) throw err;
+  db.collection("items").insertMany(myobj, function(err, res) {
+    if (err) throw err;
+    console.log("Number of documents inserted: " + res.insertedCount);
+    db.close();
+  });
+})};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 app.listen(port);
