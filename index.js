@@ -27,7 +27,7 @@ app.get('/dist/spec.json', function(req,res){
 })
 
 app.get('/code/methods/DB/:method',function(req,res){
-
+var processData = require('./lib/processdata.js');
 var MongoClient = require('mongodb').MongoClient;
 var url = "mongodb://localhost:27017/answers";
 MongoClient.connect(url, function(err, db) {
@@ -35,11 +35,14 @@ MongoClient.connect(url, function(err, db) {
   var cursor = db.collection("items").find();
    cursor.each(function(err, doc) {
     if (err) throw err;
-    console.log("document: " + doc._id, doc);
-   //TODO make a function of of the next get request that takes a document element such as for e.g. _id , question_id, is_accepted etc.. and return 
-  
-  });
+//    console.log("document: " + doc._id, doc);
+    var objFound = processData.filterMethods(doc,req.params.method);
+    console.log(objFound);
 
+  // TODO data processing input doc elements output examples i.e. check for answers that has code with at least one accepted answer. then the code has to be 3 lines or more save the detected function calls or methods speperatly to enable easy search for later.
+   
+  });
+db.close();
 })
 
 res.end();
