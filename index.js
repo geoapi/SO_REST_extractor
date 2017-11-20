@@ -33,7 +33,7 @@ var url = "mongodb://localhost:27017/answers";
 MongoClient.connect(url, function(err, db) {
   if (err) throw err;
   var cursor = db.collection("items").find();
-   cursor.each(function(err, doc) {
+  cursor.each(function(err, doc) {
     if (err) throw err;
 //    console.log("document: " + doc._id, doc);
     var objFound = processData.filterMethods(doc,req.params.method);
@@ -42,7 +42,7 @@ MongoClient.connect(url, function(err, db) {
   // TODO data processing input doc elements output examples i.e. check for answers that has code with at least one accepted answer. then the code has to be 3 lines or more save the detected function calls or methods speperatly to enable easy search for later.
    
   });
-db.close();
+//db.close();
 })
 
 res.end();
@@ -115,16 +115,29 @@ res.send(list_results);
 
 // Get all code detected from Qs into questionscode.json
 app.get('/questions/code',function(req,res){
-var results_file = require('./alltagged.json');
-
-var fc = require('./lib/filterbodyforcode.js');
+//var results_file = require('./alltagged.json');
+// TODO work on the DB instead
+var fc = require('./lib/filterbodyforcodeDB.js');
 var allContent = new Array();
-for (i = 0; i < results_file.length; i++) {
-var fdc = fc.filterResult(results_file[i]);
-var fdcParsed = JSON.parse(fdc);
-allContent.push(fdc);
-//res.send(fdcParsed);
-}
+var MongoClient = require('mongodb').MongoClient;
+var url = "mongodb://localhost:27017/answers";
+MongoClient.connect(url, function(err, db) {
+  if (err) throw err;
+  var cursor = db.collection("questions").find();
+  cursor.each(function(err, doc) {
+    if (err) throw err;
+      var fdc = fc.filterResult(JSON.stringify(doc));
+      var parsedFDC = JSON.parse(fdc).items;
+      if (parsedFDC != '')    
+       {
+         console.log(fdc);
+         allContent.push(fdc);
+       }  
+  // TODO data processing input doc elements output examples i.e. check for answers that has code with at least one accepted answer. then the code has to be 3 lines or more save the detected function calls or methods speperatly to enable easy search for later.
+
+  });
+});
+
 
 res.send(allContent);
 fs.writeFile("questionscode.json",allContent , 'utf8', function(err){
@@ -262,57 +275,21 @@ res.end();
 });
 
 
-
 //Get All  questions related to a specific tag 
 //====================================
 
-app.get('/tag/:id',function(req,res){
+app.get('/questionstagged/:tag',function(req,res){
 
 
-var tag = req.params.id;
-//var qg = require('./lib/getquestionstagged.js');
-//console.log(tag);
-
-/*
-saveCodetoDB = function(data){
-var MongoClient = require('mongodb').MongoClient;
-MongoClient.connect("mongodb://localhost:27017/stackcodes", function (err, db) {
-
-    if(err) throw err;
-    //Write to databse Insert/Update/Query code here..
-    db.collection('qcode').insert(data, function(err, record){
-    if (err) throw err;
-     console.log("saved!");
-     })
-
-});
-}
-*/
-
-var ta = require('./lib/getquestionstagged.js');   // In production change URL to 100 pr req
-
-/*
-async function getAllQuestions(tag){
-    var page = 1 
-    var res = JSON.parse(await ta.getQuestions(tag,page));
-    var all = [res.items];
-    while(res.has_more && res.quota_remaining > 0 && page<3){
-        console.log('res has more',res.has_more ,'quota remaining',res.quota_remaining)
-        page++
-        res=JSON.parse(await ta.getQuestions(tag,page));
-        all.push(res.items);
-    }
-    return all
-}
-*/
 async function getAllQuestions(tag){
     var page = 1
     var res = await ta.getQuestions(tag,page);
     var r1 = JSON.parse(res);
     var hm = r1.has_more;
-    console.log(hm);
+   // console.log(hm);
     var qr = r1.quota_remaining;
-
+    var myObj = JSON.parse(res);
+    saveQuestionstoDB(myObj.items);
  // var res = JSON.parse(res);
         //console.log('res has more',res.has_more);
 
@@ -324,6 +301,7 @@ async function getAllQuestions(tag){
         res=await ta.getQuestions(tag,page);
        // var res = JSON.parse(res);
         var r1 = JSON.parse(res);
+        saveQuestionstoDB(r1.items);
         var hm = r1.has_more;
       //  console.log(hm);
         var qr = r1.quota_remaining;
@@ -337,39 +315,23 @@ async function getAllQuestions(tag){
 }
 
 
+
+var tag = req.params.tag;
+var ta = require('./lib/getquestionstagged.js');   // In production change URL to 100 pr req
 getAllQuestions(tag).then(function(data){
-console.log('promise solved');
-//console.log(data);
-jsonresult = JSON.stringify(data);
-fs.writeFile("alltagged.json", jsonresult, 'utf8', function(err)
-                  {
-                    if (err) throw err;
-                    console.log('file saved');
-                  });
+ console.log('promise solved for ', data.length);
+    //console.log(data);
+    //Now we can ignore saving to a json file as we did in a DB
 
-
+//  jsonresult = JSON.stringify(data);
+//  fs.writeFile("alltagged.json", jsonresult, 'utf8', function(err)
+ //                 {
+ //                   if (err) throw err;
+ //                   console.log('file saved');
+ //                 });
 }).catch(function(eer){
 console.log('promise rejected ', eer);
 });
-
-/*
-function getTaggedQuestions(){
-
-ta.getQuestions(tag,1).then(function(res){
-var jsonobj = JSON.parse(res);
-var ole.log('res has more',res.has_more);
-as_more = jsonobj.has_more;
-var quota = jsonobj.quota_remaining;
-var a = [];
-a.push(has_more);
-a.push(quota);
-console.log(a);
-saveCodetoDB(JSON.parse(res));
-return a;
-});
-
-}
-*/
 res.send('working..');
 });
 
@@ -466,12 +428,24 @@ MongoClient.connect(url, function(err, db) {
   db.collection("items").insertMany(myobj, function(err, res) {
     if (err) throw err;
     console.log("Number of documents inserted: " + res.insertedCount);
-    db.close();
+//    db.close();
   });
 })};
 
 
 
+function saveQuestionstoDB(myobj){
+var MongoClient = require('mongodb').MongoClient;
+var url = "mongodb://localhost:27017/answers";
+
+MongoClient.connect(url, function(err, db) {
+  if (err) throw err;
+  db.collection("questions").insertMany(myobj, function(err, res) {
+    if (err) throw err;
+    console.log("Number of documents inserted: " + res.insertedCount);
+    //db.close();
+  });
+})};
 
 
 
