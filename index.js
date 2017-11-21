@@ -117,16 +117,22 @@ res.send(list_results);
 app.get('/questions/code',function(req,res){
 //var results_file = require('./alltagged.json');
 // TODO work on the DB instead
-var fc = require('./lib/filterbodyforcodeDB.js');
+
 var allContent = new Array();
 var MongoClient = require('mongodb').MongoClient;
 var url = "mongodb://localhost:27017/answers";
+
 MongoClient.connect(url, function(err, db) {
   if (err) throw err;
+  var fc = require('./lib/filterbodyforcodeDB.js');
+
   var cursor = db.collection("questions").find();
   cursor.each(function(err, doc) {
     if (err) throw err;
-      var fdc = fc.filterResult(JSON.stringify(doc));
+    if (doc){
+     //TODO fc.filterResults behaves strangly, make it async await and see if it behaves nicely
+      var strDoc =  JSON.stringify(doc);
+      var fdc = fc.filterResult(strDoc);
       var parsedFDC = JSON.parse(fdc).items;
       if (parsedFDC != '')    
        {
@@ -134,16 +140,10 @@ MongoClient.connect(url, function(err, db) {
          allContent.push(fdc);
        }  
   // TODO data processing input doc elements output examples i.e. check for answers that has code with at least one accepted answer. then the code has to be 3 lines or more save the detected function calls or methods speperatly to enable easy search for later.
-
+    }
   });
 });
 
-
-res.send(allContent);
-fs.writeFile("questionscode.json",allContent , 'utf8', function(err){
-             if (err) throw err
-             console.log('complete..')}
-);
 res.end();
 });
 
